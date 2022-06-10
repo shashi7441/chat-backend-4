@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>chat-backend</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.slim.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js"></script>
+    <script defer src="https://cdn.socket.io/4.5.0/socket.io.min.js"></script>
+
+    <script defer src="https://use.fontawesome.com/releases/v5.15.4/js/all.js" integrity="sha384-rOA1PnstxnOBLzCLMcre8ybwbTmemjzdNlILg8O7z1lUkLXozs4DHonlDtnE7fpc" crossorigin="anonymous">     
+    </script>
+    <link rel="stylesheet" href="/message.css">
+    <link rel="icon" href="https://i.pinimg.com/originals/da/c4/bf/dac4bfad9993da7eddada931ebedc3e1.jpg">
+</head>
+<body>
+  <div class="container">
+        
+    <div class="left">
+        <div class="top">
+            <div class="tub">
+                <div class="username">Chat with:- <%-chatWith%> </div> 
+                   </div>
+            <div class="card"> 
+                <!-- Button trigger modal -->
+<button type="button" class="btn btn-primary latest" data-toggle="modal" data-target="#exampleModal">
+   new
+  </button>
+  <!-- Modal -->
+  <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+            <div class="input-group mb-3">
+                <input id="search" type="search" name="search" class="form-control" placeholder="Recipient's username" aria-label="Recipient's username" aria-describedby="basic-addon2">
+                
+                <div class="input-group-append">
+                    <button type="button" class="btn btn-primary search">search</button>
+                </div>
+
+              </div>
+
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+    
+
+                <% for(var i=0; i<userList.length; i++) {%>
+                <div class="row mt-2">
+                  <div class="col-lg-6">
+                    <!-- <i class="fa fa-plus-square" style="font-size:36px;"></i> -->
+                    <i class="fa fa-user-plus" style="font-size:36px;"></i>
+
+                      <a class="text-secondary" href="#"><%-userList[i].fullName%></a>
+                    </div>
+                    <div class="col-lg-6">
+
+                      <a class=" btn btn-primary add" href="/api/sendRequest/<%=userList[i].id%>">add Friend </a>
+
+                  </div>
+                </div>
+              <% } %>
+
+        </div>
+        <div class="modal-footer">
+           
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+               
+        </div>
+        </div>
+        <div class="conversations">
+            <%-friendRequest%>
+                <% for(var i=0; i<data.length; i++) { %>
+            <div class="person">
+                <div class="box">
+                    <div class="image"> <img class="avatar" alt="Avatar" src=" " name = "<%= data[i].fullName %>" width="50px" height="50px" alt=""> </div>
+                    <div class="online"></div>
+                </div>
+                <div class="information">
+                    <div class="username" style="display:flex; justify-content:space-between" >
+                        <div>
+                            <a class="userName1"  href='/api/conversation/message/<%- data[i].id%>'><%= data[i].fullName %></a>
+                            <%-friendRequest%></a>
+                        </div>
+                         <div>
+                             <a  href="/api/user/unFriend/<%- data[i].id%>">
+                                 <img class="shahiImage" src="/icons8-user-48.png">
+                                </a>
+                         </div>
+
+                    </div>
+                </div>
+              
+            </div>
+            <% } %>
+            
+        </div>
+    </div>
+    
+    <div class="right">
+        <div class="top"  >
+            <div class="box">
+            
+            </div>
+
+            <!-- <div class="information">
+                <div class="username"> <a href="https://www.instagram.com/thecolorlesseyes/">thecolorlesseyes</a></div>
+                <div class="name"><p style="color: rgb(4, 121, 86);">Active now</p></div>
+            </div>
+             -->
+            
+            <div class="options">
+                       <p>
+                        <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+                            &bull;&bull;&bull;
+                        </button>
+                      </p>
+                      <div class="collapse" id="collapseExample">
+                        <div class="card card-body" style="margin-top:40%; display: flex; padding-bottom: 57%; margin-top: 57%; flex-direction: column;width: 106px;height: 55px;">
+                            <div class="seeFriendRequestParent" >
+ <a class="seeFriendRequest" href="/api/friendrequest"><i class="bi bi-bell-fill"></i></a><span style="color: red; font-weight: 700;" ><%-seeRequest.length%></span>
+ <a href="/api/auth/user/logOut"  style="color: black;text-align: center;text-decoration: none;"> logOut</a>
+                            </div>
+                        </div>
+                      </div>
+              </div>
+        </div>
+        <div class="middle">
+            <div class="tumbler" id="appendDiv">
+                
+                
+                <div class="messages" id="two">
+                        <% for(var i=0; i<showmessages.length; i++) {%>
+                        <% if(showmessages[i].from === userId){%>
+                        <div class="clip sent">
+                            <span class="text1">
+                                <%=showmessages[i].timeZone%>
+                            </span>
+                            <div class="text"><%= showmessages[i].message%></div>
+                        </div>
+                        <% } %> 
+
+                       <% if(showmessages[i].to === userId ){%>
+                        <div class="clip received">
+                            <span class="text1">
+                                <%=showmessages[i].timeZone%>
+                            </span>
+                            <div class="text"><%= showmessages[i].message%></div>
+                        </div>
+                        <% }%>
+
+                        <% } %> 
+                       
+                    </div>
+            </div>
+
+
+        </div>
+  
+        <div class="bottom">
+            <div class="cup">
+
+                   <form class="cup" action="/api/conversation/message/<%=recieverId%>" method="post">
+              
+                    <input type="text" class="mytextArea" id="message" name="message" cols="30"  rows="1" placeholder="Message..." autocomplete="off" required>
+                    <input type="hidden" id="recieverId" value="<%=recieverId%>" >
+                     <input type="hidden", id="senderId", value="<%=userId%>">
+                    <button type="submit" class="send">Send</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/5/tinymce.min.js" referrerpolicy="origin"></script> -->
+
+<script src="/socket.io/socket.io.js"></script>
+<script>  
+
+// tinymce.init({
+//     selector: ".mytextArea",
+//     plugins: "emoticons",
+//     toolbar: "emoticons",
+//     toolbar_location: "bottom",
+//     menubar: false
+// });
+
+// tinymce.get("mytextArea").getContent();
+
+
+    if ( window.history.replaceState ) {
+      window.history.replaceState( null, null, window.location.href );
+    }
+    const socket = io()
+    const mailDiv = document.getElementById('message')
+
+socket.on("connection", ()=>{
+    console.log("connected");
+})
+
+socket.on("join-room",(conversationId)=>{
+
+    console.log("client side",conversationId);
+})
+
+
+    mailDiv.addEventListener("keypress",()=>{
+        socket.emit('typing','typing...')
+    })
+    socket.on('typing',function(data){
+        const senderId = document.getElementById("senderId").value
+        const recieversId = document.getElementById("recieverId").value
+
+        if(senderId&&recieversId){
+
+            document.querySelector('p').innerHTML = data 
+        }
+
+    })
+    mailDiv.addEventListener("blur",(e)=>{
+        socket.emit('stopTyping','typing...')
+    })
+    socket.on('stopTyping',function(data){
+       const active =  document.querySelector('p')
+       active.innerHTML = 'Active now' 
+    })
+
+     socket.on("sendRequest",(data)=>{
+        const{senderId, recieverId} = data
+  console.log(data);
+
+     })
+
+
+    socket.on('chat-message',(data)=>{  
+        const{ msg, conversationId,userId, recieverId }  = data
+        console.log("sdfghjk",data);
+
+
+        const senderId = document.getElementById("senderId").value
+        const recieversId = document.getElementById("recieverId").value
+        
+        if(senderId===recieverId && recieversId ===userId){
+        console.log("client side msg", msg);
+        const mailDiv = document.getElementById('two')
+        const para = document.createElement("div");
+        para.className = "clip received"
+        const paraTwo = document.createElement("div");
+        paraTwo.className = "text"
+        const h1 = document.createElement("p");
+        h1.className = "text"
+        h1.innerText = msg
+        paraTwo.appendChild(h1)
+        para.appendChild(paraTwo)
+        mailDiv.appendChild(para)
+        }
+    })
+
+const search = document.querySelector(".search")
+
+
+search.addEventListener("click", async (e)=>{
+ const inputSearch = document.querySelector("#search")   
+
+})
+
+function generateAvatar(text, foregroundColor, backgroundColor) {
+    const canvas = document.createElement("canvas");
+    const context = canvas.getContext("2d");
+
+    canvas.width = 200;
+    canvas.height = 200;
+
+    // Draw background
+    context.fillStyle = backgroundColor;
+    context.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Draw text
+    context.font = "bold 100px Assistant";
+    context.fillStyle = foregroundColor;
+    context.textAlign = "center";
+    context.textBaseline = "middle";
+    context.fillText(text, canvas.width / 2, canvas.height / 2);
+
+    return canvas.toDataURL("image/png");
+}
+const userName = document.querySelectorAll(".userName")
+console.log(userName);
+
+const image = document.querySelectorAll(".avatar")
+
+for (i = 0; i < image.length; ++i) {
+ 
+    image[i].src = generateAvatar( image[i].name[0], "white", "#009578");
+}
+</script>
+</body>
+</html>

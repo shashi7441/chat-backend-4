@@ -5,21 +5,6 @@ import { ApiError } from '../services/error';
 import { v4 as uuid, validate } from 'uuid';
 import io from '../socketClient';
 
-let showTimeZone = (messageData)=>{
-return messageData.map((element)=>{
-    let timeZone = "";
-    if(element.createdAt.getHours()>12){
- timeZone+=`${element.createdAt.getHours()}:${element.createdAt.getMinutes()}pm`
-}else{
-timeZone+=`${element.createdAt.getHours()}:${element.createdAt.getMinutes()}am`
-// timeZone = "am"
-}
- element.timeZone = timeZone
-//  timeZone = ""
-})
-
-
-}
 
 
 export const sendMessage = async (
@@ -28,8 +13,6 @@ export const sendMessage = async (
   next: NextFunction
 ) => {
   try {
-    console.log('hiii');
-
     const id = req.params.id;
     const myId = uuid();
     const { message } = req.body;
@@ -133,16 +116,29 @@ export const sendMessage = async (
       ],
     });
 
+
+    messageData.forEach((element)=>{
+      let timeZone = "";
+      if(element.createdAt.getHours()>12){
+   timeZone+=`${element.createdAt.getHours()}:${element.createdAt.getMinutes()}pm`
+  }else{
+  timeZone+=`${element.createdAt.getHours()}:${element.createdAt.getMinutes()}am`
+  // timeZone = "am"
+  }
+   element.timeZone = timeZone
+  //  timeZone = ""
+  return element
+  })
     return res.render('test', {
       data: [],
       userId: req.id,
       conversationId: '',
+      userName:req.fullName,
       chatWith: cheackFriend.reciever.fullName,
       friendRequest: '',
       seeRequest: '',
       showmessages: messageData,
       sendMessage: '',
-      userList: [],
       recieverId: numberId,
     });
   } catch (e: any) {
@@ -188,8 +184,21 @@ export const seeMessages = async (
     });
 
 
-let data = showTimeZone(messageData)
-console.log("FFFFFFFFFFf",data);
+     messageData.forEach((element)=>{
+      let timeZone = "";
+      if(element.createdAt.getHours()>12){
+   timeZone+=`${element.createdAt.getHours()}:${element.createdAt.getMinutes()}pm`
+  }else{
+  timeZone+=`${element.createdAt.getHours()}:${element.createdAt.getMinutes()}am`
+  // timeZone = "am"
+  }
+   element.timeZone = timeZone
+  //  timeZone = ""
+  return element
+  })
+    
+
+
 
 
     if (!messageData) {
@@ -211,12 +220,12 @@ console.log("FFFFFFFFFFf",data);
       data: [],
       userId: loginId,
       conversationId: '',
+       userName:req.fullName,
       chatWith: user.fullName,
       friendRequest: '',
       seeRequest: '',
-      showmessages: data,
+      showmessages: messageData,
       sendMessage: '',
-      userList: [],
       recieverId: otherUser,
     });
   } catch (e: any) {

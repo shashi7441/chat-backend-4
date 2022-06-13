@@ -3,7 +3,7 @@ import {Request, Response} from 'express'
 export const app = express();
 import dotenv from 'dotenv'
 dotenv.config()
-// import { googleRoutes } from './router/googleRoutes';
+import { googleRoutes } from './router/googleRoutes';
 import { friendRequestRoutes } from './router/friendRequestRouter';
 import { messageRoutes } from './router/messageRouter';
 import { error } from './services/error';
@@ -17,7 +17,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use('/api/auth/user', userRoutes);
-// app.use('/', googleRoutes);
+app.use('/', googleRoutes);
 
 app.use('/api', friendRequestRoutes);
 app.use('/api', messageRoutes);

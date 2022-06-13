@@ -17,18 +17,15 @@ export const tokenVarify = async (
     const secretKey: any = process.env.SECRET_KEY;
     const token: any = req.cookies.access_token;
     if (!token) {
-      return res.status(400).json({
-        message: 'A token is required for authentication',
-        status: 400,
-        success: false,
-      });
+    return res.render("login")
     } else {
       // const authHeader: any = req.headers.authorization;
       // const bearerToken: any = authHeader.split(" ");
       // let myToken: any = bearerToken[1];
       await jwt.verify(token, secretKey, async (error: any, payload: any) => {
-        if (payload) {
+        if (payload) { 
           req.id = payload.id;
+          req.fullName = payload.fullName
           next();
         } else {
           return res.status(400).json({
@@ -125,10 +122,10 @@ export const userVerifiedEmail = async (req: Request, res: Response) => {
           },
         }
       );
-
-      const result = `${ngrokUrl}/api/auth/user/login`
- const data =   result.replace(/ /g,"" )
-     return res.redirect(data);
+   return res.render("login2",{msg:""} )
+//       const result = `${ngrokUrl}/api/auth/user/login2`
+//  const data =   result.replace(/ /g,"" )
+//      return res.redirect(data);
     }
   } catch (e: any) {
     console.log(e);
@@ -152,15 +149,3 @@ export const pageNotFound = async (_: Request, res: Response) => {
   }
 };
 
-export const searchFriendForFrontend = async (req, res, userId: any) => {
-  const userData = await users.findAll({
-    where: {
-      id: {
-        [Op.ne]: [userId],
-      },
-    },
-    attributes: ['email', 'fullName', 'id'],
-  });
-
-  return userData;
-};

@@ -6,7 +6,7 @@ import dotenv from 'dotenv';
 import { ApiError } from '../services/error';
 import { Op } from 'sequelize';
 import { html, createOtp } from '../services/otpMailTemplate';
-import { searchFriendForFrontend, sendMail } from '../services/userService';
+import {  sendMail } from '../services/userService';
 import { v4 as uuid } from 'uuid';
 
 dotenv.config();
@@ -98,18 +98,11 @@ export const signup = async (req: Request, res: any, next: NextFunction) => {
     });
 
     if (!findData) {
-      const { fullName }: { fullName: string } = req.body;
-      if (!fullName) {
-        return res.render('login', { msg: 'fullName is required', url:"" });
-      }
-      if (fullName.length < 3) {
-        return res.render('login', { msg: 'charcter lenght should be 3', url:"" });
-      }
-      const fullNameTrim: string = fullName.trim();
+   
 
       let realOtp = createOtp();
       await users.create({
-        fullName: fullNameTrim,
+        fullName:null, 
         email: emailTrim,
         password: hash,
         id: myId,
@@ -177,23 +170,56 @@ export const signup = async (req: Request, res: any, next: NextFunction) => {
           urt:data
         });
       }
-      if (verified === true) {
+      if (verified === true) {  
         if (passwordMatch) {
-          const jwtToken = jwt.sign({ id: loginId }, secretKey, {
-            expiresIn: '1d',
-          });
-          res.cookie('access_token', `${jwtToken}`, {
-            expires: new Date(Date.now() + 9999999),
-            httpOnly: false,
-          });
-        }
+          if(findData.fullName ===null) {
+            const { fullName }: { fullName: string } = req.body;
+            if (!fullName) {
+              return res.render('login2', { msg: 'fullName is required', url:"" });
+            }
+            if (fullName.length < 3) {
+              return res.render('login2', { msg: 'charcter lenght should be 3', url:"" });
+            }
+            const fullNameTrim: string = fullName.trim();
+                  await users.update({fullName:fullNameTrim}, {where:{
+                    email:emailTrim
+                  }})
+                  
+                  const jwtToken = jwt.sign({ id: loginId , fullName:findData.fullName }, secretKey, {
+                    expiresIn: '1d',
+                  });
+            res.cookie('access_token', `${jwtToken}`, {
+              expires: new Date(Date.now() + 9999999),
+              httpOnly: false,
+            });
+            
+            const result = `${ngrokUrl}/api/auth/user/searchFriend`
+            const data =   result.replace(/ /g,"" )
+                return res.redirect(data);
+                
+              }
+              else{
+                
+                               console.log(findData.fullName);
+                const jwtToken = jwt.sign({ id: loginId, fullName:findData.fullName }, secretKey, {
+        expiresIn: '1d',
+      });
+      res.cookie('access_token', `${jwtToken}`, {
+        expires: new Date(Date.now() + 9999999),
+        httpOnly: false,
+      });
+  const result = `${ngrokUrl}/api/auth/user/searchFriend`
+  const data =   result.replace(/ /g,"" )
+      return res.redirect(data);
+   }
+          
         
-    const result = `${ngrokUrl}/api/auth/user/searchFriend`
-    const data =   result.replace(/ /g,"" )
-        return res.redirect(data);
-      
-      }
+        }
+  
+          }         
 
+
+        
     }
   } catch (e: any) {
     console.log(e);
@@ -209,52 +235,25 @@ export const searchFriend = async (
   next: NextFunction
 ) => {
   try {
-
-
-    const search: any = req.query.search;
-// console.log(req.rawHeaders);
- 
-
-    if (!search) {
       const userId = req.id;
       const loginId = req.id;
       const { userData } = await getAllUser(userId);
-      const userList = await searchFriendForFrontend(req, res, userId);
       const friendRequests = await friendRequestCount(userId);
       res.render('test', {
         data: userData,
         userId: loginId,
+        userName:req.fullName,
         conversationId: '',
         chatWith: '',
         showmessages: [],
         sendMessage: '',
-        userList: userList,
         recieverId: '',
         friendRequest: '',
         seeRequest: friendRequests,
       });
     }
 
-    if (search) {
-      const originalSearch = search.replace(/[' "]+/g, '');
-      const user = await users.findAll(
-        {
-          where: {
-            id: {
-              [Op.ne]: [req.id],
-            },
-
-            fullName: {
-              [Op.iRegexp]: `${originalSearch}`,
-            },
-            isVerified: true,
-          },
-        },
-        { attributes: ['email', 'fullName', 'id'] }
-      );
-      return user;
-    }
-  } catch (e: any) {
+  catch (e: any) {
     return next(new ApiError(e.message, 400));
   }
   return true;
@@ -275,4 +274,48 @@ export const logOut = (req:Request, res:Response)=>{
     })
   }
 }
+
+
+export const searchFriendForSpecificUser = async (
+  req: any,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const search: any = req.query.search;
+    if (search) {
+      const originalSearch = search.replace(/[' "]+/g, '');
+      const user = await users.findAll(
+        {
+          where: {
+            id: {
+              [Op.ne]: [req.id],
+            },
+
+            fullName: {
+              [Op.iRegexp]: `${originalSearch}`,
+            },
+            isVerified: true,
+          },
+        },
+        { attributes: ['email', 'fullName', 'id'] }
+      );
+      if(!user){
+        return res.json({
+          statusCode:200,
+          data:[]
+        })
+      }
+    
+
+      return res.json({
+        statusCode:200,
+        data:user
+      })
+    }
+  } catch (e: any) {
+    return next(new ApiError(e.message, 400));
+  }
+  return true;
+};
 

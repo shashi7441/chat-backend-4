@@ -493,3 +493,8 @@ body {
   text-decoration: none;
   opacity: 1;
 }
+#logOut:hover{
+  border: 3px dotted #ff7a59;
+  color: #ff7a59;
+  background: #fff;
+}

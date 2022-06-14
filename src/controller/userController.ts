@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-const { users, conversation } = require('../../models');
+const { users, conversation, messages } = require('../../models');
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import dotenv from 'dotenv';
@@ -239,8 +239,38 @@ export const searchFriend = async (
       const loginId = req.id;
       const { userData } = await getAllUser(userId);
       const friendRequests = await friendRequestCount(userId);
-      res.render('test', {
+
+      // const showMessageUnderName = await messages.findAll({
+      //   where: {
+      //     to: {
+      //       [Op.or]: [numberId, req.id],
+      //     },
+      //     from: {
+      //       [Op.or]: [numberId, req.id],
+      //     },
+      //   },
+
+
+      //   order:[
+      //     ['createdAt', 'DESC'],
+      //   ],
+      //   include: [
+      //     {
+      //       model: users,
+      //       as: 'reciever',
+      //       attributes: ['fullName', 'id'],
+      //     },
+      //     {
+      //       model: users,
+      //       as: 'sender',
+      //       attributes: ['fullName', 'id'],
+      //     },
+      //   ],
+      // });
+
+  return res.render('test', {
         data: userData,
+        showMessageUnderName:"",
         userId: loginId,
         userName:req.fullName,
         conversationId: '',
@@ -256,7 +286,7 @@ export const searchFriend = async (
   catch (e: any) {
     return next(new ApiError(e.message, 400));
   }
-  return true;
+ 
 };
 
 

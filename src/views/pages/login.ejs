@@ -21,7 +21,7 @@
       
       <input id="value" type="hidden" value="false">  
       <button id="myButton" type="submit" style="padding-right: 43% ;padding-left: 36%; display: flex; justify-content: space-between; " > Login 
-            <img id="loader" src="/Spin-1s-64px (1).gif"  style="height: 24px; width:24px; display: inline;" alt="">
+            <!-- <img id="loader" src="/Spin-1s-64px (1).gif"  style="height: 24px; width:24px; display: inline;" alt=""> -->
           </button> 
           <!-- <a href="/google" class="login-with-google-btn" >
               Sign in with Google
@@ -56,17 +56,17 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
 <script>
 
-$(document).ready(function(){
-  $("#myForm").on("submit", function(){
-    $("#pageloader").fadeIn();
-  });
-});
+// $(document).ready(function(){
+//   $("#myForm").on("submit", function(){
+//     $("#pageloader").fadeIn();
+//   });
+// });
 
 
 const loader = document.getElementById("loader")
 
 const inputValue = document.getElementById("value").value
-console.log(inputValue);
+
 if(inputValue === "false"){
   window.onload = function(){ document.getElementById("loader").style.display = "none" }
 }
@@ -75,22 +75,14 @@ const myForm = document.getElementById("myForm")
 
 const myButton = document.getElementById("myButton")
 
-myButton.addEventListener("submit", (e)=>{
-  e.preventDefault()
-  inputValue.innerText = "true"
-  setTimeout(()=>{
-  },3000)
-  window.onload = function(){ document.getElementById("loader").style.display = "inline" }
-})
-
-// myForm.addEventListener("submit", (e)=>{
-//   if(inputValue === true){
-//   }
-//   setTimeout(()=>{
-//     console.log("hii");
-//   },3000)
+// myButton.addEventListener("submit", (e)=>{
 //   e.preventDefault()
+//   inputValue.innerText = "true"
+//   setTimeout(()=>{
+//   },3000)
+//   window.onload = function(){ document.getElementById("loader").style.display = "inline" }
 // })
+
 
   
 </script>

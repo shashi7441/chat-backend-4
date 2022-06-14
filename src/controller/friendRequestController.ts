@@ -31,6 +31,7 @@ export const sendFriendRequest = async (
     if (numberId === req.id) {
       res.render('test', {
         data: [],
+        showMessageUnderName:"",
         userId: req.id,
         userName:req.fullName,
         conversationId: '',
@@ -46,6 +47,7 @@ export const sendFriendRequest = async (
     if (!recieverData) {
       res.render('test', {
         data: [],
+        showMessageUnderName:"",
         userId: req.id,
         conversationId: '',
         chatWith: '',
@@ -71,6 +73,7 @@ export const sendFriendRequest = async (
         res.render('test', {
           data: [],
           userId: req.id,
+          showMessageUnderName:"",
           conversationId: '',
           chatWith: '',
           seeRequest: '',
@@ -87,6 +90,7 @@ export const sendFriendRequest = async (
           userId: req.id,
           conversationId: '',
           chatWith: '',
+          showMessageUnderName:"",
           seeRequest: '',
           showmessages: [],
           sendMessage: '',
@@ -99,6 +103,7 @@ export const sendFriendRequest = async (
         res.render('test', {
           data: [],
           userId: req.id,
+          showMessageUnderName:"",
           conversationId: '',
           chatWith: '',
           seeRequest: '',
@@ -113,6 +118,7 @@ export const sendFriendRequest = async (
         res.render('test', {
           data: [],
           userId: req.id,
+          showMessageUnderName:"",
           conversationId: '',
           chatWith: '',
           seeRequest: '',
@@ -130,6 +136,7 @@ export const sendFriendRequest = async (
           data: [],
           userId: req.id,
           conversationId: '',
+          showMessageUnderName:"",
           chatWith: '',
           userName:req.fullName,
           seeRequest: '',
@@ -169,6 +176,7 @@ export const sendFriendRequest = async (
 
       return res.render('test', {
         data: [],
+        showMessageUnderName:"",
         userId: req.id,
         conversationId: '',
         chatWith: '',

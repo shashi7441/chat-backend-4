@@ -24,7 +24,7 @@ module.exports = (sequelize, DataTypes) => {
       to: DataTypes.UUID,
       from: DataTypes.UUID,
       message: DataTypes.STRING,
-      state: DataTypes.ENUM('unedited', 'edited'),
+      status: DataTypes.ENUM('unedited', 'edited', "read", "unread"),
     },
     {
       sequelize,

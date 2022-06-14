@@ -26,6 +26,7 @@
         <div class="top">
             <div class="tub">
                 <div class="username">Chat with:- <%-chatWith%> </div> 
+                <input type="hidden" id="reciever_Id" value="<%=recieverId%>" >
                    </div>
             <div class="card"> 
                 <!-- Button trigger modal -->
@@ -66,14 +67,25 @@
                 <% for(var i=0; i<data.length; i++) { %>
             <div class="person">
                 <div class="box">
-                    <div class="image"> <img class="avatar" alt="Avatar" src=" " name = "<%= data[i].fullName %>" width="50px" height="50px" alt=""> </div>
+                    <div class="image"> <img class="avatar" alt="Avatar" src=" " name = "<%-data[i].fullName%>" width="50px" height="50px" alt=""> </div>
                     <div class="online"></div>
                 </div>
                 <div class="information">
                     <div class="username" style="display:flex; justify-content:space-between" >
                         <div>
                             <a class="userName1"  href='/api/conversation/message/<%- data[i].id%>'><%= data[i].fullName %></a>
-                            <%-friendRequest%></a>
+                            <div id="<%-data[i].id%>count" style=
+                            "height: 25px;
+                            width: 25px;
+                            display: inline-block;
+                            border: 1px solid black;
+                            margin: auto;
+                            border-radius: 50%;
+                            background-color: #ff9f9f;
+                            padding-left: 5%;
+                            margin-left: 0%;" ></div>
+                            <p id="<%-data[i].id%>"><%-showMessageUnderName%></p>
+                            <input class="allUserId" type="hidden" value="<%-data[i].id%>" >
                         </div>
                          <div>
                              <a  href="/api/user/unFriend/<%- data[i].id%>">
@@ -91,6 +103,16 @@
     
     <div class="right">
         <div class="top"  >
+            <div class="box">
+                <!-- <div class="image"> <img class="avatar" src="" width="50px" height="50px" alt=""> </div>
+                <div class="online"></div> -->
+         </div>
+            <div class="information">
+                <div class="username"> <a href="https://www.instagram.com/thecolorlesseyes/"><%-userName%></a></div>
+                <div class="name"><p style="color: rgb(4, 121, 86);">Active now</p></div>
+            </div>
+
+
             <div class="options">
                        <p>
                         <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
@@ -98,7 +120,7 @@
                         </button>
                       </p>
 
-                       <h1 style="width:70% ;" ><%-userName%></h1>
+                       <!-- <h1 style="width:70% ;" ><%-userName%></h1> -->
                       <div class="collapse" id="collapseExample">
                         <div class="card card-body" style="margin-top:40%; display: flex; padding-bottom: 57%; margin-top: 57%; flex-direction: column;width: 106px;height: 55px;">
                             <div class="seeFriendRequestParent" >
@@ -120,7 +142,13 @@
                             <span class="text1">
                                 <%=showmessages[i].timeZone%>
                             </span>
-                            <div class="text"><%= showmessages[i].message%></div>
+                            <div class="text"><%= showmessages[i].message%>
+                                <% if (showmessages[i].status === "read") { %>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="15" id="msg-dblcheck-ack" x="2063" y="2076"><path d="M15.01 3.316l-.478-.372a.365.365 0 0 0-.51.063L8.666 9.88a.32.32 0 0 1-.484.032l-.358-.325a.32.32 0 0 0-.484.032l-.378.48a.418.418 0 0 0 .036.54l1.32 1.267a.32.32 0 0 0 .484-.034l6.272-8.048a.366.366 0 0 0-.064-.512zm-4.1 0l-.478-.372a.365.365 0 0 0-.51.063L4.566 9.88a.32.32 0 0 1-.484.032L1.892 7.77a.366.366 0 0 0-.516.005l-.423.433a.364.364 0 0 0 .006.514l3.255 3.185a.32.32 0 0 0 .484-.033l6.272-8.048a.365.365 0 0 0-.063-.51z" fill="#4fc3f7"/></svg>
+                                    <%} else { %>
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="15" id="msg-dblcheck-ack" x="2063" y="2076"><path d="M15.01 3.316l-.478-.372a.365.365 0 0 0-.51.063L8.666 9.88a.32.32 0 0 1-.484.032l-.358-.325a.32.32 0 0 0-.484.032l-.378.48a.418.418 0 0 0 .036.54l1.32 1.267a.32.32 0 0 0 .484-.034l6.272-8.048a.366.366 0 0 0-.064-.512zm-4.1 0l-.478-.372a.365.365 0 0 0-.51.063L4.566 9.88a.32.32 0 0 1-.484.032L1.892 7.77a.366.366 0 0 0-.516.005l-.423.433a.364.364 0 0 0 .006.514l3.255 3.185a.32.32 0 0 0 .484-.033l6.272-8.048a.365.365 0 0 0-.063-.51z" fill="#434c54"/></svg>
+                                        <% } %>    
+                        </div>
                         </div>
                         <% } %> 
 
@@ -129,7 +157,13 @@
                             <span class="text1">
                                 <%=showmessages[i].timeZone%>
                             </span>
-                            <div class="text"><%= showmessages[i].message%></div>
+                            <div class="text"><%= showmessages[i].message%>
+                                <% if (showmessages[i].status === "read") { %>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="15" id="msg-dblcheck-ack" x="2063" y="2076"><path d="M15.01 3.316l-.478-.372a.365.365 0 0 0-.51.063L8.666 9.88a.32.32 0 0 1-.484.032l-.358-.325a.32.32 0 0 0-.484.032l-.378.48a.418.418 0 0 0 .036.54l1.32 1.267a.32.32 0 0 0 .484-.034l6.272-8.048a.366.366 0 0 0-.064-.512zm-4.1 0l-.478-.372a.365.365 0 0 0-.51.063L4.566 9.88a.32.32 0 0 1-.484.032L1.892 7.77a.366.366 0 0 0-.516.005l-.423.433a.364.364 0 0 0 .006.514l3.255 3.185a.32.32 0 0 0 .484-.033l6.272-8.048a.365.365 0 0 0-.063-.51z" fill="#4fc3f7"/></svg>
+                                    <%} else { %>
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="15" id="msg-dblcheck-ack" x="2063" y="2076"><path d="M15.01 3.316l-.478-.372a.365.365 0 0 0-.51.063L8.666 9.88a.32.32 0 0 1-.484.032l-.358-.325a.32.32 0 0 0-.484.032l-.378.48a.418.418 0 0 0 .036.54l1.32 1.267a.32.32 0 0 0 .484-.034l6.272-8.048a.366.366 0 0 0-.064-.512zm-4.1 0l-.478-.372a.365.365 0 0 0-.51.063L4.566 9.88a.32.32 0 0 1-.484.032L1.892 7.77a.366.366 0 0 0-.516.005l-.423.433a.364.364 0 0 0 .006.514l3.255 3.185a.32.32 0 0 0 .484-.033l6.272-8.048a.365.365 0 0 0-.063-.51z" fill="#434c54"/></svg>
+                                        <% } %>                            
+                        </div>
                         </div>
                         <% }%>
 
@@ -144,13 +178,16 @@
         <div class="bottom">
             <div class="cup">
             <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIEAAACBCAMAAADQfiliAAAAZlBMVEX///8AAADk5OQiIiK0tLTX19d8fHzq6ura2trn5+f6+vpDQ0Py8vI3Nzfu7u4bGxsWFhbIyMgRERG9vb2np6eUlJRQUFBLS0tXV1cqKirR0dFjY2OcnJyMjIxcXFxqampycnKEhIQ2NWOsAAADuklEQVR4nO2b67qqIBCGww4aHshS81Tm/d/kTjlEy6UoOO5n74fvn2sVvMIwwMy021lZWf0Pwq5XOsHf6t1Lmj2iKpqDs3X3QZJdkSySJ1uOBU5CNFSY4K0A4t/67xniTfrH7Uj/ndoNhiGqJgAQqiJwgPskAEJ3aIQxE5CMARYgVwIglEMCpDMAEErhAMpZAAiVYAT+TAIfCuAwEwChAxDBXt010x4GIJ4NgBCMe34tIGggAIKruuOPIDzjkkmAmYbHIoIHAMH0nvhTz/UBcLaI4L7+mS1S74qyQnd1gnOxiKBY//DszPeInfaWwBJYAktgCSyBJbAElsASWAJLAE3gll5gRBB4pdH9rSbvO+jRgOB4R4jU+gAJbc3VJnDpQ6ILgAlt4KFNwKIeRDfmf2atvbQJePDrrEngstjVU4Og6DtlgfCrrjHy6FnWDeLC+EEfwcAsGXHVDajgC23A7wiCuUFlqnv3HcziLhft3E8hv8JzEUHVDyJ7KHQBRD6jt6rTIoK2+4rDHvRzHi1r4dY93BYRfH2l1SZI5BaiRQSB/AbaHknkVPrFsCik2Ue2+VIwyLmIGKLXPc1PcLBJ8NhDaBDm5q9No8QLCPrP80h0pQ8gDCHsp6GeDdDvhtwbGJjBZznRUQ3mBnbD3g7F4jE6rDSsEZo9m7sge16RmTPLt4g+acainQVAl7/IiNyMCLhjZpaAVXnvTnf6UT5l+i6ZitsiNa6dS5QAhG7FwmxN7LBTILqk8+CoEAi1OzEHxDjVIQaBUL9ynt6lfXocigSo6RC851Mk/Kkp7PDUJvlinxHr9rlCWcgn4d6w1pKxA9uevTBuxJ+O5gBymo+94c5tfwVozwMAg6uCrM8S9PkeE6U//WOYiv99LGWtcgzpkEpELhV7aR7Sg+QlzFNPzHf8WS3Fagm3WEo519LqipwyvsWlI+2+gbR9kRVrMeQNwZ9qt5TXqqE7HkdA2VhaO/7Ky64K8Ea4yI37yfAedk6+fNV1ZYD3+33fmfZVXUbc+nBU1tW3kygA0v/O0B2H1evUnl7V8OTiw1RMtoOOxqR/QVAonlcBMGqpKwjX6mKUaw1boxioStNS+HJVnIzPRbZRqep7S8iGGzTJpM1hAzm3RxVyL3UJq8dt84rlTvwmCVUIZwksgSWwBJbAEliCf4TAS09cPLySi7+kHjyAiCuNyDxupJCnAGBxeECpo9srBW5Gpa4dh6gXl6VOc0AvDKxKO/rgdwZn+idN+RbXhug4LvBftVlZWcHpD7ATMLL+x5COAAAAAElFTkSuQmCC"  style="width: 6%;height: 1%;" alt="">
-                   <form class="cup" action="/api/conversation/message/<%=recieverId%>" method="post">
-              
+                  
+            <form class="cup" action="/api/conversation/message/<%=recieverId%>" method="post">
                     <input type="text" class="mytextArea" id="message" name="message" cols="30"  rows="1" placeholder="Message..." autocomplete="off" required>
                     <input type="hidden" id="recieverId" value="<%=recieverId%>" >
                      <input type="hidden", id="senderId", value="<%=userId%>">
                     <button type="submit" class="send">Send</button>
                 </form>
+
+
+
             </div>
         </div>
     </div>
@@ -159,9 +196,9 @@
 
 <script src="/socket.io/socket.io.js"></script>
 <script>  
-let SpeechRecognition = window.SpeechRecognition
-
-var recognition = new SpeechRecognition();
+if ( window.history.replaceState ) {
+  window.history.replaceState( null, null, window.location.href );
+}
 
 // tinymce.init({
 //     selector: ".mytextArea",
@@ -174,9 +211,7 @@ var recognition = new SpeechRecognition();
 // tinymce.get("mytextArea").getContent();
 
 
-    if ( window.history.replaceState ) {
-      window.history.replaceState( null, null, window.location.href );
-    }
+
     const socket = io()
     const mailDiv = document.getElementById('message')
 
@@ -213,20 +248,20 @@ socket.on("join-room",(conversationId)=>{
 
      socket.on("sendRequest",(data)=>{
         const{senderId, recieverId} = data
-//   console.log(data);
 
      })
+     let countData = []
 
-
-    socket.on('chat-message',(data)=>{  
-        const{ msg, conversationId,userId, recieverId }  = data
-    
-
+     socket.on('chat-message',(data)=>{  
+         const{ msg, conversationId,userId, recieverId }  = data;
+         const real =  countData.push(msg)
+        const textUnderName = document.getElementById(userId);
+        textUnderName.innerText = msg
+        const countID = document.getElementById(`${userId}count`)
+         countID.innerText = real
         const senderId = document.getElementById("senderId").value
-        const recieversId = document.getElementById("recieverId").value
-        
+        const recieversId = document.getElementById("recieverId").value 
         if(senderId===recieverId && recieversId ===userId){
-        console.log("client side msg", msg);
         const mailDiv = document.getElementById('two')
         const para = document.createElement("div");
         para.className = "clip received"
@@ -239,16 +274,14 @@ socket.on("join-room",(conversationId)=>{
         para.appendChild(paraTwo)
         mailDiv.appendChild(para)
         }
+
     })
 
 const search = document.querySelector(".search")
-
-
 search.addEventListener("click", async (e)=>{
  const inputSearch = document.querySelector("#search")   
 console.log(inputSearch.value);
-await fetch(` https://df31-122-168-231-81.in.ngrok.io/api/auth/user/searchFriendForSpecificUser?search=${inputSearch.value}`).then((result)=>{
-// console.log("...",result.json());
+await fetch(`/api/auth/user/searchFriendForSpecificUser?search=${inputSearch.value}`).then((result)=>{
   return result.json()
 
 }).then((result1)=>{
@@ -256,10 +289,8 @@ await fetch(` https://df31-122-168-231-81.in.ngrok.io/api/auth/user/searchFriend
     let html;
     console.log(result1.data);
       if(result1.data.length==0){
-       
         const html2 = `<h1 style="color: black;"> No user found </h1>`
         body2.innerHTML = html2
-
       }
 else{
      result1.data.forEach((element)=>{
@@ -272,35 +303,24 @@ else{
           <a class=" btn btn-primary add" href="/api/sendRequest/${element.id}">add Friend </a>
       </div>
     </div>`
-          console.log("CCCCC",element.fullName);
-          console.log("<<<<", element.id);
         })
-        
         body2.innerHTML = html
     }
 })
-
-
 })
 
 function generateAvatar(text, foregroundColor, backgroundColor) {
     const canvas = document.createElement("canvas");
     const context = canvas.getContext("2d");
-
     canvas.width = 200;
     canvas.height = 200;
-
-    // Draw background
     context.fillStyle = backgroundColor;
     context.fillRect(0, 0, canvas.width, canvas.height);
-
-    // Draw text
     context.font = "bold 100px Assistant";
     context.fillStyle = foregroundColor;
     context.textAlign = "center";
     context.textBaseline = "middle";
     context.fillText(text, canvas.width / 2, canvas.height / 2);
-
     return canvas.toDataURL("image/png");
 }
 const userName = document.querySelectorAll(".userName")

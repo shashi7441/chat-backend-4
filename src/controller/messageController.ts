@@ -1,9 +1,11 @@
 const { messages, conversation, users } = require('../../models/');
-import { Op } from 'sequelize';
+import { Op, where } from 'sequelize';
 import { Response, NextFunction } from 'express';
 import { ApiError } from '../services/error';
 import { v4 as uuid, validate } from 'uuid';
 import io from '../socketClient';
+import { getAllUser } from './userController';
+
 
 
 
@@ -21,14 +23,12 @@ export const sendMessage = async (
     if (checkId === false) {
       return next(new ApiError('please put valid id ', 400));
     }
-
     if (message.length == 0) {
       return res.json({
         statusCode: 400,
         message: 'message not be empty',
       });
     }
-
     const messageTrim: string = message.trim();
     const cheackFriend = await conversation.findOne({
       where: {
@@ -41,36 +41,35 @@ export const sendMessage = async (
           attributes: ['fullName'],
           as: 'reciever',
         },
+        {
+          model: users,
+          attributes: ['fullName'],
+          as: 'sender',
+        },
       ],
     });
-    // console.log("value>>>>>>>>>>>>>>>>>>>>>>", cheackFriend);
-
     if (!cheackFriend) {
       return next(new ApiError('you are not friend', 404));
     }
     const value = cheackFriend.state;
-
     if (req.id === numberId) {
       return res.json({
         statusCode: 400,
         message: 'sender and reciever are not  same ',
       });
     }
-
     if (value === 'blocked') {
       return res.json({
         statusCode: 400,
         message: 'blocked user can not send request',
       });
     }
-
     if (value === 'pending') {
       return res.json({
         statusCode: 400,
         message: 'you are not friend',
       });
     }
-
     if (value === 'unfriend') {
       return res.json({
         statusCode: 400,
@@ -84,7 +83,7 @@ export const sendMessage = async (
       from: req.id,
       conversationId: cheackFriend.id,
       message: messageTrim,
-      state: 'unedited',
+      status: 'unedited',
     });
     io.emit('chat-message', {
       msg: createData.message,
@@ -102,6 +101,10 @@ export const sendMessage = async (
           [Op.or]: [numberId, req.id],
         },
       },
+      order:[
+        ['createdAt', 'ASC'],
+
+      ],
       include: [
         {
           model: users,
@@ -116,6 +119,9 @@ export const sendMessage = async (
       ],
     });
 
+    await  messages.update({status:"read"},{ where:{
+      to:id, from:req.id
+    }})
 
     messageData.forEach((element)=>{
       let timeZone = "";
@@ -133,8 +139,9 @@ export const sendMessage = async (
       data: [],
       userId: req.id,
       conversationId: '',
+      showMessageUnderName:"",
       userName:req.fullName,
-      chatWith: cheackFriend.reciever.fullName,
+      chatWith: cheackFriend.sender.fullName,
       friendRequest: '',
       seeRequest: '',
       showmessages: messageData,
@@ -142,8 +149,6 @@ export const sendMessage = async (
       recieverId: numberId,
     });
   } catch (e: any) {
-    // console.log("dddd", e);
-
     return next(new ApiError(e.message, 404));
   }
 };
@@ -157,9 +162,19 @@ export const seeMessages = async (
     const id = req.params.id;
     const numberId: any = id.replace(/[' "]+/g, '');
     const checkId = validate(numberId);
+    const userId = req.id
     if (checkId === false) {
       return next(new ApiError('please put valid id ', 400));
     }
+  
+
+    const { userData } = await getAllUser(userId);
+
+  await  messages.update({status:"read"},{ where:{
+    to:id, from:req.id
+  }
+  })
+ 
     const messageData = await messages.findAll({
       where: {
         to: {
@@ -169,6 +184,10 @@ export const seeMessages = async (
           [Op.or]: [numberId, req.id],
         },
       },
+      order:[
+        ['createdAt', 'ASC'],
+
+      ],
       include: [
         {
           model: users,
@@ -184,6 +203,34 @@ export const seeMessages = async (
     });
 
 
+    const showMessageUnderName = await messages.findAll({
+      where: {
+        to: {
+          [Op.or]: [numberId, req.id],
+        },
+        from: {
+          [Op.or]: [numberId, req.id],
+        },
+      },
+      order:[
+        ['createdAt', 'DESC'],
+      ],
+      include: [
+        {
+          model: users,
+          as: 'reciever',
+          attributes: ['fullName', 'id'],
+        },
+        {
+          model: users,
+          as: 'sender',
+          attributes: ['fullName', 'id'],
+        },
+      ],
+    });
+    console.log(showMessageUnderName[0].message);
+
+
      messageData.forEach((element)=>{
       let timeZone = "";
       if(element.createdAt.getHours()>12){
@@ -197,9 +244,6 @@ export const seeMessages = async (
   return element
   })
     
-
-
-
 
     if (!messageData) {
       return res.json({
@@ -220,6 +264,7 @@ export const seeMessages = async (
       data: [],
       userId: loginId,
       conversationId: '',
+      showMessageUnderName:showMessageUnderName[0].message,
        userName:req.fullName,
       chatWith: user.fullName,
       friendRequest: '',
@@ -229,6 +274,8 @@ export const seeMessages = async (
       recieverId: otherUser,
     });
   } catch (e: any) {
+
+    
     return next(new ApiError(e.message, 404));
   }
 };
@@ -350,16 +397,13 @@ export const editmessage = async (
 
     const messageData = await messages.findOne({
       where: {
-        id: numberId,
-        [Op.or]: [
-          {
-            to: req.id,
+            to:{
+             [Op.or]: [numberId, req.id],
+            } ,
+            from:{
+              [Op.or]: [numberId, req.id]
+             }, 
           },
-          {
-            from: req.id,
-          },
-        ],
-      },
     });
     if (!messageData) {
       return res.json({
@@ -377,7 +421,7 @@ export const editmessage = async (
       await messages.update(
         {
           message: messageTrim,
-          state: 'edited',
+          status: 'edited',
         },
         {
           where: {
@@ -404,3 +448,6 @@ export const editmessage = async (
     });
   }
 };
+
+
+

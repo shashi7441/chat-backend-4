@@ -1,13 +1,10 @@
 const { messages, conversation, users } = require('../../models/');
-import { Op, where } from 'sequelize';
+import { Op } from 'sequelize';
 import { Response, NextFunction } from 'express';
 import { ApiError } from '../services/error';
 import { v4 as uuid, validate } from 'uuid';
 import io from '../socketClient';
 import { getAllUser } from './userController';
-
-
-
 
 export const sendMessage = async (
   req: any,
@@ -20,10 +17,13 @@ export const sendMessage = async (
     const { message } = req.body;
     const numberId: any = id.replace(/[' "]+/g, '');
     const checkId = validate(numberId);
+
+    const userId = req.id;
+
     if (checkId === false) {
       return next(new ApiError('please put valid id ', 400));
     }
-    if (message.length == 0) {
+    if (message.length === 0) {
       return res.json({
         statusCode: 400,
         message: 'message not be empty',
@@ -101,10 +101,7 @@ export const sendMessage = async (
           [Op.or]: [numberId, req.id],
         },
       },
-      order:[
-        ['createdAt', 'ASC'],
-
-      ],
+      order: [['createdAt', 'ASC']],
       include: [
         {
           model: users,
@@ -119,28 +116,35 @@ export const sendMessage = async (
       ],
     });
 
-    await  messages.update({status:"read"},{ where:{
-      to:id, from:req.id
-    }})
+    const { userData } = await getAllUser(userId);
 
-    messageData.forEach((element)=>{
-      let timeZone = "";
-      if(element.createdAt.getHours()>12){
-   timeZone+=`${element.createdAt.getHours()}:${element.createdAt.getMinutes()}pm`
-  }else{
-  timeZone+=`${element.createdAt.getHours()}:${element.createdAt.getMinutes()}am`
-  // timeZone = "am"
-  }
-   element.timeZone = timeZone
-  //  timeZone = ""
-  return element
-  })
+    await messages.update(
+      { status: 'read' },
+      {
+        where: {
+          to: id,
+          from: req.id,
+        },
+      }
+    );
+
+    messageData.forEach((element) => {
+      let timeZone = '';
+      if (element.createdAt.getHours() > 12) {
+        timeZone += `${element.createdAt.getHours()}:${element.createdAt.getMinutes()}pm`;
+      } else {
+        timeZone += `${element.createdAt.getHours()}:${element.createdAt.getMinutes()}am`;
+        // timeZone = "am"
+      }
+      element.timeZone = timeZone;
+      //  timeZone = ""
+      return element;
+    });
     return res.render('test', {
-      data: [],
+      data: userData,
       userId: req.id,
       conversationId: '',
-      showMessageUnderName:"",
-      userName:req.fullName,
+      userName: req.fullName,
       chatWith: cheackFriend.sender.fullName,
       friendRequest: '',
       seeRequest: '',
@@ -162,19 +166,23 @@ export const seeMessages = async (
     const id = req.params.id;
     const numberId: any = id.replace(/[' "]+/g, '');
     const checkId = validate(numberId);
-    const userId = req.id
+    const userId = req.id;
     if (checkId === false) {
       return next(new ApiError('please put valid id ', 400));
     }
-  
 
     const { userData } = await getAllUser(userId);
 
-  await  messages.update({status:"read"},{ where:{
-    to:id, from:req.id
-  }
-  })
- 
+    await messages.update(
+      { status: 'read' },
+      {
+        where: {
+          to: id,
+          from: req.id,
+        },
+      }
+    );
+
     const messageData = await messages.findAll({
       where: {
         to: {
@@ -184,10 +192,7 @@ export const seeMessages = async (
           [Op.or]: [numberId, req.id],
         },
       },
-      order:[
-        ['createdAt', 'ASC'],
-
-      ],
+      order: [['createdAt', 'ASC']],
       include: [
         {
           model: users,
@@ -202,48 +207,18 @@ export const seeMessages = async (
       ],
     });
 
-
-    const showMessageUnderName = await messages.findAll({
-      where: {
-        to: {
-          [Op.or]: [numberId, req.id],
-        },
-        from: {
-          [Op.or]: [numberId, req.id],
-        },
-      },
-      order:[
-        ['createdAt', 'DESC'],
-      ],
-      include: [
-        {
-          model: users,
-          as: 'reciever',
-          attributes: ['fullName', 'id'],
-        },
-        {
-          model: users,
-          as: 'sender',
-          attributes: ['fullName', 'id'],
-        },
-      ],
+    messageData.forEach((element) => {
+      let timeZone = '';
+      if (element.createdAt.getHours() > 12) {
+        timeZone += `${element.createdAt.getHours()}:${element.createdAt.getMinutes()}pm`;
+      } else {
+        timeZone += `${element.createdAt.getHours()}:${element.createdAt.getMinutes()}am`;
+        // timeZone = "am"
+      }
+      element.timeZone = timeZone;
+      //  timeZone = ""
+      return element;
     });
-    console.log(showMessageUnderName[0].message);
-
-
-     messageData.forEach((element)=>{
-      let timeZone = "";
-      if(element.createdAt.getHours()>12){
-   timeZone+=`${element.createdAt.getHours()}:${element.createdAt.getMinutes()}pm`
-  }else{
-  timeZone+=`${element.createdAt.getHours()}:${element.createdAt.getMinutes()}am`
-  // timeZone = "am"
-  }
-   element.timeZone = timeZone
-  //  timeZone = ""
-  return element
-  })
-    
 
     if (!messageData) {
       return res.json({
@@ -260,12 +235,11 @@ export const seeMessages = async (
       },
     });
 
-    res.render('test', {
-      data: [],
+    return res.render('test', {
+      data: userData,
       userId: loginId,
       conversationId: '',
-      showMessageUnderName:showMessageUnderName[0].message,
-       userName:req.fullName,
+      userName: req.fullName,
       chatWith: user.fullName,
       friendRequest: '',
       seeRequest: '',
@@ -274,8 +248,6 @@ export const seeMessages = async (
       recieverId: otherUser,
     });
   } catch (e: any) {
-
-    
     return next(new ApiError(e.message, 404));
   }
 };
@@ -387,7 +359,7 @@ export const editmessage = async (
         message: 'message is required',
       });
     }
-    if (message.length == 0) {
+    if (message.length === 0) {
       return res.json({
         statusCode: 400,
         message: 'message not be empty',
@@ -397,13 +369,13 @@ export const editmessage = async (
 
     const messageData = await messages.findOne({
       where: {
-            to:{
-             [Op.or]: [numberId, req.id],
-            } ,
-            from:{
-              [Op.or]: [numberId, req.id]
-             }, 
-          },
+        to: {
+          [Op.or]: [numberId, req.id],
+        },
+        from: {
+          [Op.or]: [numberId, req.id],
+        },
+      },
     });
     if (!messageData) {
       return res.json({
@@ -412,7 +384,7 @@ export const editmessage = async (
       });
     }
     const messageId = messageData.from;
-    if (messageId != req.id) {
+    if (messageId !== req.id) {
       return res.json({
         statusCode: 400,
         message: 'you can not edit message',
@@ -448,6 +420,3 @@ export const editmessage = async (
     });
   }
 };
-
-
-

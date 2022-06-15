@@ -21,12 +21,9 @@ export const userLoginValidation = (
     return JoiSchema.validate(user);
   };
   const response = validateUser(req.body);
-  // console.log('ffdasfdasfaf', req.body);
+
   if (response.error) {
-
-
     const msg = response.error.details[0].message;
-    console.log(msg);
 
     // return res
     //   .status(422)
@@ -43,15 +40,11 @@ export const userSignupValidation = (
 ) => {
   const validateUser = (user: object) => {
     const JoiSchema = joi.object({
-      email: joi
-        .string()
-        .email({
-          minDomainSegments: 2,
-          tlds: { allow: ['com', 'net'] },
-        })
-        .trim()
-        .required(),
-      password: joi.string().min(6).max(50).required().trim(),
+      email: joi.string().email({
+        minDomainSegments: 2,
+        tlds: { allow: ['com', 'net'] },
+      }),
+      password: joi.string().min(6).max(50),
       fullName: joi.string().min(0).max(20),
     });
     return JoiSchema.validate(user);
@@ -61,7 +54,6 @@ export const userSignupValidation = (
 
   if (response.error) {
     const msg = response.error.details[0].message;
-    console.log(req.body);
 
     return res
       .status(422)
@@ -87,6 +79,7 @@ export const userOtpValidation = (
         .trim()
         .required(),
       otp: joi.string().length(6).required(),
+      password: joi.string(),
     });
 
     return JoiSchema.validate(user);

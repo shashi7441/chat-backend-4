@@ -63,6 +63,9 @@ html {
   position: absolute;
   right: 10px;
   border-radius: 50px;
+  margin-top: 16%;
+  margin-right: 83%;
+  margin-bottom: -9%;
 }
 .left > .top > .card:hover {
   background-color: #0084ff;
@@ -491,21 +494,20 @@ body {
   text-decoration: none;
   opacity: 1;
 }
-#logOut:hover{
+#logOut:hover {
   border: 3px dotted #ff7a59;
   color: #ff7a59;
   background: #fff;
 }
 
-
-#circle{
-height: 25px;
-width: 25px;
-display: inline-block;
-border: 1px solid black;
-margin: auto;
-border-radius: 50%;
-background-color: #ff9f9f;
-padding-left: 5%;
-margin-left: 0%;
+#circle {
+  height: 25px;
+  width: 25px;
+  display: inline-block;
+  border: 1px solid black;
+  margin: auto;
+  border-radius: 50%;
+  background-color: #ff9f9f;
+  padding-left: 5%;
+  margin-left: 0%;
 }

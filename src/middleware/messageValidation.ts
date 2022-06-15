@@ -13,8 +13,6 @@ export const mesageValidation = (
   };
   const response = validateMessage(req.body);
   if (response.error) {
-    console.log(req.body);
-
     const msg = response.error.details[0].message;
     return res
       .status(422)

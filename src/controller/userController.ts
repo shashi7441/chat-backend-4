@@ -6,16 +6,14 @@ import dotenv from 'dotenv';
 import { ApiError } from '../services/error';
 import { Op } from 'sequelize';
 import { html, createOtp } from '../services/otpMailTemplate';
-import {  sendMail } from '../services/userService';
+import { sendMail } from '../services/userService';
 import { v4 as uuid } from 'uuid';
 
 dotenv.config();
 
-const ngrokUrl = process.env.NGROKBASEURL
+const ngrokUrl = process.env.NGROKBASEURL;
 
 const friendRequestCount = async (userId: any) => {
-  console.log("<<", userId);
-  
   const userData = await conversation.findAll({
     where: {
       recieverId: userId,
@@ -50,7 +48,6 @@ export const getAllUser = async (userId: any) => {
   });
 
   if (conversationData.length <= 0) {
-    console.log('00000');
     myobj = {
       userData: [],
       conversationId: null,
@@ -72,12 +69,31 @@ export const getAllUser = async (userId: any) => {
         id: otherIds,
       },
     });
+
+    for (let i = 0; i < userData.length; i++) {
+      const lastMessage = await messages.findAll({
+        limit: 1,
+        where: {
+          to: {
+            [Op.or]: [userId, userData[i].id],
+          },
+          from: {
+            [Op.or]: [userId, userData[i].id],
+          },
+        },
+        order: [['createdAt', 'DESC']],
+      });
+
+      if (lastMessage[0]) {
+        userData[i].lastMessage = lastMessage[0].message;
+      }
+    }
     myobj = {
       userData: userData,
     };
-
     return myobj;
   }
+
   return true;
 };
 
@@ -98,11 +114,9 @@ export const signup = async (req: Request, res: any, next: NextFunction) => {
     });
 
     if (!findData) {
-   
-
       let realOtp = createOtp();
       await users.create({
-        fullName:null, 
+        fullName: null,
         email: emailTrim,
         password: hash,
         id: myId,
@@ -126,11 +140,12 @@ export const signup = async (req: Request, res: any, next: NextFunction) => {
       );
       const values = findCreateData.dataValues.isVerified;
       if (!passwordMatch) {
-        return res.render('login', { msg: 'invalid credential', url:"" });
+        return res.render('login', { msg: 'invalid credential', url: '' });
       }
       if (values === false) {
         return res.render('verifyemail', {
           msg: 'otp will be send on email',
+          password: passwordTrim,
         });
       }
     } else {
@@ -158,72 +173,82 @@ export const signup = async (req: Request, res: any, next: NextFunction) => {
         );
       }
       if (!passwordMatch) {
-        return res.render('login', { msg: 'invalid credential', url:"" });
+        return res.render('login', { msg: 'invalid credential', url: '' });
         // return next(new ApiError("Invalid credential", 400));
       }
       if (verified === false) {
-        const result = `${ngrokUrl}/api/verifyEmail`
-        const data =   result.replace(/ /g,"" )
+        const result = `${ngrokUrl}/api/verifyEmail`;
+        const data = result.replace(/ /g, '');
 
         return res.render('verifyemail', {
           msg: 'otp will be send on email',
-          urt:data
+          urt: data,
+          password: passwordTrim,
         });
       }
-      if (verified === true) {  
-        if (passwordMatch) {
-          if(findData.fullName ===null) {
-            const { fullName }: { fullName: string } = req.body;
-            if (!fullName) {
-              return res.render('login2', { msg: 'fullName is required', url:"" });
+      if (verified === true) {
+        if (findData.fullName === null) {
+          const { fullName }: { fullName: string } = req.body;
+          if (!fullName) {
+            return res.render('login2', {
+              msg: 'fullName is required',
+              url: '',
+              email: '',
+              password: '',
+            });
+          }
+          if (fullName.length < 3) {
+            return res.render('login2', {
+              msg: 'charcter lenght should be 3',
+              url: '',
+              email: '',
+              password: '',
+            });
+          }
+          const fullNameTrim: string = fullName.trim();
+          await users.update(
+            { fullName: fullNameTrim },
+            {
+              where: {
+                email: email,
+              },
             }
-            if (fullName.length < 3) {
-              return res.render('login2', { msg: 'charcter lenght should be 3', url:"" });
+          );
+          const jwtToken = jwt.sign(
+            { id: loginId, fullName: findData.fullName },
+            secretKey,
+            {
+              expiresIn: '1d',
             }
-            const fullNameTrim: string = fullName.trim();
-                  await users.update({fullName:fullNameTrim}, {where:{
-                    email:emailTrim
-                  }})
-                  
-                  const jwtToken = jwt.sign({ id: loginId , fullName:findData.fullName }, secretKey, {
-                    expiresIn: '1d',
-                  });
+          );
+          res.cookie('access_token', `${jwtToken}`, {
+            expires: new Date(Date.now() + 9999999),
+            httpOnly: false,
+          });
+          const result = `${ngrokUrl}/api/auth/user/searchFriend`;
+          const data = result.replace(/ /g, '');
+          return res.redirect(data);
+        } else {
+          if (passwordMatch) {
+            const jwtToken = jwt.sign(
+              { id: loginId, fullName: findData.fullName },
+              secretKey,
+              {
+                expiresIn: '1d',
+              }
+            );
             res.cookie('access_token', `${jwtToken}`, {
               expires: new Date(Date.now() + 9999999),
               httpOnly: false,
             });
-            
-            const result = `${ngrokUrl}/api/auth/user/searchFriend`
-            const data =   result.replace(/ /g,"" )
-                return res.redirect(data);
-                
-              }
-              else{
-                
-                               console.log(findData.fullName);
-                const jwtToken = jwt.sign({ id: loginId, fullName:findData.fullName }, secretKey, {
-        expiresIn: '1d',
-      });
-      res.cookie('access_token', `${jwtToken}`, {
-        expires: new Date(Date.now() + 9999999),
-        httpOnly: false,
-      });
-  const result = `${ngrokUrl}/api/auth/user/searchFriend`
-  const data =   result.replace(/ /g,"" )
-      return res.redirect(data);
-   }
-          
-        
+            const result = `${ngrokUrl}/api/auth/user/searchFriend`;
+            const data = result.replace(/ /g, '');
+            return res.redirect(data);
+          }
         }
-  
-          }         
-
-
-        
+      }
     }
   } catch (e: any) {
-    console.log(e);
-
     return next(new ApiError(e.message, 400));
   }
   return true;
@@ -235,76 +260,39 @@ export const searchFriend = async (
   next: NextFunction
 ) => {
   try {
-      const userId = req.id;
-      const loginId = req.id;
-      const { userData } = await getAllUser(userId);
-      const friendRequests = await friendRequestCount(userId);
-
-      // const showMessageUnderName = await messages.findAll({
-      //   where: {
-      //     to: {
-      //       [Op.or]: [numberId, req.id],
-      //     },
-      //     from: {
-      //       [Op.or]: [numberId, req.id],
-      //     },
-      //   },
-
-
-      //   order:[
-      //     ['createdAt', 'DESC'],
-      //   ],
-      //   include: [
-      //     {
-      //       model: users,
-      //       as: 'reciever',
-      //       attributes: ['fullName', 'id'],
-      //     },
-      //     {
-      //       model: users,
-      //       as: 'sender',
-      //       attributes: ['fullName', 'id'],
-      //     },
-      //   ],
-      // });
-
-  return res.render('test', {
-        data: userData,
-        showMessageUnderName:"",
-        userId: loginId,
-        userName:req.fullName,
-        conversationId: '',
-        chatWith: '',
-        showmessages: [],
-        sendMessage: '',
-        recieverId: '',
-        friendRequest: '',
-        seeRequest: friendRequests,
-      });
-    }
-
-  catch (e: any) {
+    const userId = req.id;
+    const loginId = req.id;
+    const { userData } = await getAllUser(userId);
+    const friendRequests = await friendRequestCount(userId);
+    return res.render('test', {
+      data: userData,
+      userId: loginId,
+      userName: req.fullName,
+      conversationId: '',
+      chatWith: '',
+      showmessages: [],
+      sendMessage: '',
+      recieverId: '',
+      friendRequest: '',
+      seeRequest: friendRequests,
+    });
+  } catch (e: any) {
     return next(new ApiError(e.message, 400));
   }
- 
 };
 
-
-export const logOut = (req:Request, res:Response)=>{
-  try{
-    const result = `${ngrokUrl}/api/auth/user/login`
-    const data =   result.replace(/ /g,"" )
- return  res.clearCookie("access_token").redirect(data)
-
-
-  }catch(e:any){
+export const logOut = (req: Request, res: Response) => {
+  try {
+    const result = `${ngrokUrl}/api/auth/user/login`;
+    const data = result.replace(/ /g, '');
+    return res.clearCookie('access_token').redirect(data);
+  } catch (e: any) {
     return res.json({
-      statusCode:400,
-      msg:e.msg
-    })
+      statusCode: 400,
+      msg: e.msg,
+    });
   }
-}
-
+};
 
 export const searchFriendForSpecificUser = async (
   req: any,
@@ -330,22 +318,20 @@ export const searchFriendForSpecificUser = async (
         },
         { attributes: ['email', 'fullName', 'id'] }
       );
-      if(!user){
+      if (!user) {
         return res.json({
-          statusCode:200,
-          data:[]
-        })
+          statusCode: 200,
+          data: [],
+        });
       }
-    
 
       return res.json({
-        statusCode:200,
-        data:user
-      })
+        statusCode: 200,
+        data: user,
+      });
     }
   } catch (e: any) {
     return next(new ApiError(e.message, 400));
   }
   return true;
 };
-

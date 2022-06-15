@@ -21,7 +21,7 @@
 </head>
 <body>
   <div class="container">
-        
+
     <div class="left">
         <div class="top">
             <div class="tub">
@@ -84,7 +84,7 @@
                             background-color: #ff9f9f;
                             padding-left: 5%;
                             margin-left: 0%;" ></div>
-                            <p id="<%-data[i].id%>"><%-showMessageUnderName%></p>
+                            <p id="<%-data[i].id%>"><%-data[i].lastMessage%></p>
                             <input class="allUserId" type="hidden" value="<%-data[i].id%>" >
                         </div>
                          <div>
@@ -104,8 +104,6 @@
     <div class="right">
         <div class="top"  >
             <div class="box">
-                <!-- <div class="image"> <img class="avatar" src="" width="50px" height="50px" alt=""> </div>
-                <div class="online"></div> -->
          </div>
             <div class="information">
                 <div class="username"> <a href="https://www.instagram.com/thecolorlesseyes/"><%-userName%></a></div>
@@ -133,8 +131,6 @@
         </div>
         <div class="middle">
             <div class="tumbler" id="appendDiv">
-                
-                
                 <div class="messages" id="two">
                         <% for(var i=0; i<showmessages.length; i++) {%>
                         <% if(showmessages[i].from === userId){%>
@@ -178,39 +174,37 @@
         <div class="bottom">
             <div class="cup">
             <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIEAAACBCAMAAADQfiliAAAAZlBMVEX///8AAADk5OQiIiK0tLTX19d8fHzq6ura2trn5+f6+vpDQ0Py8vI3Nzfu7u4bGxsWFhbIyMgRERG9vb2np6eUlJRQUFBLS0tXV1cqKirR0dFjY2OcnJyMjIxcXFxqampycnKEhIQ2NWOsAAADuklEQVR4nO2b67qqIBCGww4aHshS81Tm/d/kTjlEy6UoOO5n74fvn2sVvMIwwMy021lZWf0Pwq5XOsHf6t1Lmj2iKpqDs3X3QZJdkSySJ1uOBU5CNFSY4K0A4t/67xniTfrH7Uj/ndoNhiGqJgAQqiJwgPskAEJ3aIQxE5CMARYgVwIglEMCpDMAEErhAMpZAAiVYAT+TAIfCuAwEwChAxDBXt010x4GIJ4NgBCMe34tIGggAIKruuOPIDzjkkmAmYbHIoIHAMH0nvhTz/UBcLaI4L7+mS1S74qyQnd1gnOxiKBY//DszPeInfaWwBJYAktgCSyBJbAElsASWAJLAE3gll5gRBB4pdH9rSbvO+jRgOB4R4jU+gAJbc3VJnDpQ6ILgAlt4KFNwKIeRDfmf2atvbQJePDrrEngstjVU4Og6DtlgfCrrjHy6FnWDeLC+EEfwcAsGXHVDajgC23A7wiCuUFlqnv3HcziLhft3E8hv8JzEUHVDyJ7KHQBRD6jt6rTIoK2+4rDHvRzHi1r4dY93BYRfH2l1SZI5BaiRQSB/AbaHknkVPrFsCik2Ue2+VIwyLmIGKLXPc1PcLBJ8NhDaBDm5q9No8QLCPrP80h0pQ8gDCHsp6GeDdDvhtwbGJjBZznRUQ3mBnbD3g7F4jE6rDSsEZo9m7sge16RmTPLt4g+acainQVAl7/IiNyMCLhjZpaAVXnvTnf6UT5l+i6ZitsiNa6dS5QAhG7FwmxN7LBTILqk8+CoEAi1OzEHxDjVIQaBUL9ynt6lfXocigSo6RC851Mk/Kkp7PDUJvlinxHr9rlCWcgn4d6w1pKxA9uevTBuxJ+O5gBymo+94c5tfwVozwMAg6uCrM8S9PkeE6U//WOYiv99LGWtcgzpkEpELhV7aR7Sg+QlzFNPzHf8WS3Fagm3WEo519LqipwyvsWlI+2+gbR9kRVrMeQNwZ9qt5TXqqE7HkdA2VhaO/7Ky64K8Ea4yI37yfAedk6+fNV1ZYD3+33fmfZVXUbc+nBU1tW3kygA0v/O0B2H1evUnl7V8OTiw1RMtoOOxqR/QVAonlcBMGqpKwjX6mKUaw1boxioStNS+HJVnIzPRbZRqep7S8iGGzTJpM1hAzm3RxVyL3UJq8dt84rlTvwmCVUIZwksgSWwBJbAEliCf4TAS09cPLySi7+kHjyAiCuNyDxupJCnAGBxeECpo9srBW5Gpa4dh6gXl6VOc0AvDKxKO/rgdwZn+idN+RbXhug4LvBftVlZWcHpD7ATMLL+x5COAAAAAElFTkSuQmCC"  style="width: 6%;height: 1%;" alt="">
-                  
             <form class="cup" action="/api/conversation/message/<%=recieverId%>" method="post">
-                    <input type="text" class="mytextArea" id="message" name="message" cols="30"  rows="1" placeholder="Message..." autocomplete="off" required>
+                    <input type="text" class="mytextArea" id="message" name="message" cols="30"  rows="1" placeholder="Message..." autocomplete="on" required>
+                    <!-- <i class="bi bi-emoji-smile-upside-down" id="myTextArea"></i> -->
                     <input type="hidden" id="recieverId" value="<%=recieverId%>" >
                      <input type="hidden", id="senderId", value="<%=userId%>">
                     <button type="submit" class="send">Send</button>
                 </form>
-
-
-
             </div>
         </div>
     </div>
 </div>
 <!-- <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/5/tinymce.min.js" referrerpolicy="origin"></script> -->
-
 <script src="/socket.io/socket.io.js"></script>
 <script>  
 if ( window.history.replaceState ) {
   window.history.replaceState( null, null, window.location.href );
 }
 
+
+// document.querySelector('emoji-picker')
+//   .addEventListener('emoji-click', event => console.log(event.detail));
+
+
+
 // tinymce.init({
 //     selector: ".mytextArea",
 //     plugins: "emoticons",
 //     toolbar: "emoticons",
-//     toolbar_location: "bottom",
+//     toolbar_location: "top",
 //     menubar: false
 // });
-
-// tinymce.get("mytextArea").getContent();
-
-
 
     const socket = io()
     const mailDiv = document.getElementById('message')
@@ -280,14 +274,12 @@ socket.on("join-room",(conversationId)=>{
 const search = document.querySelector(".search")
 search.addEventListener("click", async (e)=>{
  const inputSearch = document.querySelector("#search")   
-console.log(inputSearch.value);
 await fetch(`/api/auth/user/searchFriendForSpecificUser?search=${inputSearch.value}`).then((result)=>{
   return result.json()
 
 }).then((result1)=>{
     const body2 =  document.getElementById("body2")
     let html;
-    console.log(result1.data);
       if(result1.data.length==0){
         const html2 = `<h1 style="color: black;"> No user found </h1>`
         body2.innerHTML = html2
@@ -324,14 +316,27 @@ function generateAvatar(text, foregroundColor, backgroundColor) {
     return canvas.toDataURL("image/png");
 }
 const userName = document.querySelectorAll(".userName")
-console.log(userName);
-
 const image = document.querySelectorAll(".avatar")
 
 for (i = 0; i < image.length; ++i) {
  
     image[i].src = generateAvatar( image[i].name[0], "white", "#009578");
 }
+
+// $(document).ready(function() {
+// 	$("#message").emojioneArea({
+  	
+// 		pickerPosition: "right",
+//     tonesStyle: "bullet",
+// 		events: {
+//          	keyup: function (editor, event) {d
+//         	}
+//     	}
+// 	});        
+            
+// });
+
+
 </script>
 </body>
 </html>

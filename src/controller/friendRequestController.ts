@@ -10,8 +10,6 @@ export const sendFriendRequest = async (
   next: NextFunction
 ) => {
   try {
-    
-    
     const myId = uuid();
     const id = req.params.id;
     const numberId: any = id.replace(/[' "]+/g, '');
@@ -19,9 +17,6 @@ export const sendFriendRequest = async (
     if (checkId === false) {
       return next(new ApiError('please put valid id ', 400));
     }
-    // console.log(numberId);
-    // console.log(req.id);
-    
     const recieverData: any = await users.findOne({
       where: {
         id: req.id,
@@ -29,11 +24,10 @@ export const sendFriendRequest = async (
     });
 
     if (numberId === req.id) {
-      res.render('test', {
+      return res.render('test', {
         data: [],
-        showMessageUnderName:"",
         userId: req.id,
-        userName:req.fullName,
+        userName: req.fullName,
         conversationId: '',
         chatWith: '',
         seeRequest: '',
@@ -45,14 +39,13 @@ export const sendFriendRequest = async (
     }
 
     if (!recieverData) {
-      res.render('test', {
+      return res.render('test', {
         data: [],
-        showMessageUnderName:"",
         userId: req.id,
         conversationId: '',
         chatWith: '',
         seeRequest: '',
-        userName:req.fullName,
+        userName: req.fullName,
         showmessages: [],
         sendMessage: '',
         recieverId: numberId,
@@ -70,27 +63,25 @@ export const sendFriendRequest = async (
       const senderId = cheackFriendRequest.dataValues.senderId;
       const status = cheackFriendRequest.dataValues.state;
       if (status === 'blocked') {
-        res.render('test', {
+        return res.render('test', {
           data: [],
           userId: req.id,
-          showMessageUnderName:"",
           conversationId: '',
           chatWith: '',
           seeRequest: '',
           showmessages: [],
-          userName:req.fullName,
+          userName: req.fullName,
           sendMessage: '',
           recieverId: numberId,
           friendRequest: 'you can not send request',
         });
       }
       if (status === 'accepted') {
-        res.render('test', {
+        return res.render('test', {
           data: [],
           userId: req.id,
           conversationId: '',
           chatWith: '',
-          showMessageUnderName:"",
           seeRequest: '',
           showmessages: [],
           sendMessage: '',
@@ -100,14 +91,13 @@ export const sendFriendRequest = async (
         });
       }
       if (status === 'pending' && senderId === numberId) {
-        res.render('test', {
+        return res.render('test', {
           data: [],
           userId: req.id,
-          showMessageUnderName:"",
           conversationId: '',
           chatWith: '',
           seeRequest: '',
-          userName:req.fullName,
+          userName: req.fullName,
           showmessages: [],
           sendMessage: '',
           recieverId: numberId,
@@ -115,14 +105,13 @@ export const sendFriendRequest = async (
         });
       }
       if (status === 'pending') {
-        res.render('test', {
+        return res.render('test', {
           data: [],
           userId: req.id,
-          showMessageUnderName:"",
           conversationId: '',
           chatWith: '',
           seeRequest: '',
-          userName:req.fullName,
+          userName: req.fullName,
           showmessages: [],
           sendMessage: '',
           userList: [],
@@ -132,13 +121,12 @@ export const sendFriendRequest = async (
       }
       1;
       if (status === 'unfriend') {
-        res.render('test', {
+        return res.render('test', {
           data: [],
           userId: req.id,
           conversationId: '',
-          showMessageUnderName:"",
           chatWith: '',
-          userName:req.fullName,
+          userName: req.fullName,
           seeRequest: '',
           showmessages: [],
           sendMessage: '',
@@ -176,11 +164,10 @@ export const sendFriendRequest = async (
 
       return res.render('test', {
         data: [],
-        showMessageUnderName:"",
         userId: req.id,
         conversationId: '',
         chatWith: '',
-        userName:req.fullName,
+        userName: req.fullName,
         seeRequest: '',
         showmessages: [],
         sendMessage: '',
@@ -189,8 +176,6 @@ export const sendFriendRequest = async (
       });
     }
   } catch (e: any) {
-    console.log('eeeeeeeeee', e);
-
     return next(new ApiError(e.message, 400));
   }
 };
@@ -235,7 +220,7 @@ export const friendRequestAccept = async (
       const match = req.id === recieverId;
       const value = cheackFriendRequest.dataValues.state;
 
-      if (value === 'pending' && match == false) {
+      if (value === 'pending' && match === false) {
         return next(new ApiError('sender can not accept request', 400));
       }
 
@@ -266,8 +251,6 @@ export const friendRequestAccept = async (
       }
     }
   } catch (e: any) {
-    console.log(e);
-
     return next(new ApiError(e.message, 400));
   }
 };
@@ -309,7 +292,7 @@ export const friendRequestReject = async (
       if (value === 'pending' && match === false) {
         return next(new ApiError('sender can not reject request', 400));
       }
-      if (value === 'pending' && match == true) {
+      if (value === 'pending' && match === true) {
         await conversation.destroy({
           where: {
             recieverId: req.id,
@@ -486,7 +469,7 @@ export const unFriend = async (req: any, res: Response, next: NextFunction) => {
       return next(new ApiError('please put valid id ', 400));
     }
 
-    if (req.id == numberId) {
+    if (req.id === numberId) {
       return next(new ApiError('can not unfriend ', 404));
     }
 

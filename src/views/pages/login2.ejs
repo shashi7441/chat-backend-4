@@ -13,8 +13,10 @@
         <h1><%-msg%></h1>
       <h1>Login</h1> 
       <input type="text" name="fullName" placeholder="user name" required>
-      <input type="text" name="email" placeholder="email" required >
-      <input type="password" name="password" placeholder="Password" required>
+      <!-- <input type="text" name="email" placeholder="email" required > -->
+      <input type="hidden" name="email" value="<%-email%>" >
+      <input type="hidden" name="password" value="<%-password%>">
+      <!-- <input type="password" name="password" placeholder="Password" required> -->
       <button type="submit" style="padding-right: 43% ;padding-left: 36%" > login</button>
     </form>
        

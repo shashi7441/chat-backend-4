@@ -1,8 +1,7 @@
 import express from 'express';
-import {Request, Response} from 'express'
 export const app = express();
-import dotenv from 'dotenv'
-dotenv.config()
+import dotenv from 'dotenv';
+dotenv.config();
 import { googleRoutes } from './router/googleRoutes';
 import { friendRequestRoutes } from './router/friendRequestRouter';
 import { messageRoutes } from './router/messageRouter';
@@ -33,7 +32,6 @@ app.get('/failed', (req, res) => {
     message: 'Invalid credential',
   });
 });
-
 
 app.use('/*', pageNotFound);
 

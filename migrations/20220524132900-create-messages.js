@@ -17,7 +17,7 @@ module.exports = {
         type: Sequelize.STRING,
       },
       state: {
-        type: Sequelize.ENUM('unedited', 'edited', "read", "unread" ),
+        type: Sequelize.ENUM('unedited', 'edited', 'read', 'unread'),
         defaultValue: 'unedited',
       },
       conversationId: {
